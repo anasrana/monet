@@ -2,10 +2,10 @@ Package: monet
 Title: Multi-Omics NETwork inference (MONET)
 Version: 0.0.0.9000
 Authors@R:
-  person(given = "First",
-         family = "Last",
+  person(given = "Anas A",
+         family = "Rana",
          role = c("aut", "cre"),
-         email = "first.last@example.com")
+         email = "a.a.rana@bham.ac.uk")
 Description: What the package does (one paragraph).
 License: GPL (>=3)
 Depends:
