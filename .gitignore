@@ -32,6 +32,7 @@ results/
 doc/presentation/
 doc/report/libs/
 *_cache/
+analysis/
 
 # OS X
 .DS_Store

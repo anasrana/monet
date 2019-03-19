@@ -2,18 +2,18 @@ Package: monet
 Title: Multi-Omics NETwork inference (MONET)
 Version: 0.0.0.9000
 Authors@R:
-  person(given = "Anas A",
-         family = "Rana",
-         role = c("aut", "cre"),
-         email = "a.a.rana@bham.ac.uk")
+  person("Anas Ahmad", "Rana", email = "a.a.rana@bham.ac.uk",
+       role = c("aut", "cre"))
+Maintainer: Anas Ahmad Rana <a.a.rana@bham.ac.uk>
 Description: What the package does (one paragraph).
 License: GPL (>=3)
 Depends:
-  data.table,
   methods,
   R (>= 3.4.0),
+  magrittr,
   Rcpp (>= 1.0.0)
 Imports:
+  data.table,
   rstan (>= 2.18.2),
   rstantools (>= 1.5.1)
 LinkingTo:
@@ -27,3 +27,5 @@ LazyData: true
 NeedsCompilation: yes
 SystemRequirements: GNU make
 RoxygenNote: 6.1.1
+Suggests: 
+    testthat
