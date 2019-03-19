@@ -7,6 +7,8 @@
 #' @param atac_seq ATAC-Seq.
 #' @param gene_col column of gene names in gene_exp either in the file or
 #'  data.frame
+#' @param gene_atac column of gene names in atac_seq if different from
+#'  gene_col.
 #'
 #' @return monetInput class based on input to function.
 #' @export
@@ -14,10 +16,13 @@
 #' @examples
 #'
 monetInput <- function(gene_exp = NULL,
-                       atac_seq = NULL, gene_col = NULL) {
+                       atac_seq = NULL,
+                       gene_col = NULL,
+                       gene_atac = NULL) {
 
     gene_exp_dt <- readGeneExp(gene_exp, gene_col)
 
+    return(gene_exp_dt)
 }
 
 #' readGeneExp
@@ -32,22 +37,12 @@ monetInput <- function(gene_exp = NULL,
 readGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
     # TODO: if gene_col doesn't exist give warning
     if (!is.null(gene_col)) {
-        gene_num <- suppressWarnings(as.numeric(gene_col))
-
-        if (!is.na(gene_num)) {
-            gene_col  <- gene_num
-        }
-
-        if ("character" %in% class(gene_exp) & !is.na(gene_num)) {
-            gene_col <- fread(gene_exp, nrows = 1) %>%
-                colnames() %>%
-                nth(gene_col)
-        } else if (!is.na(gene_num) & is.data.frame(gene_exp)) {
-            gene_col <- colnames(gene_exp)[gene_col]
-        }
+        gene_col <- testGeneCol(gene_col = gene_col, file_path = gene_exp)
     }
 
     if ("character" %in% class(gene_exp)) {
+        checkFile(gene_exp)
+
         if (file.exists(gene_exp) & !is.null(gene_col)) {
             gene_exp <- fread(gene_exp, key = gene_col)
         } else if (file.exists(gene_exp)) {
