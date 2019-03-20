@@ -20,21 +20,21 @@ monetInput <- function(gene_exp = NULL,
                        gene_col = NULL,
                        gene_atac = NULL) {
 
-    gene_exp_dt <- readGeneExp(gene_exp, gene_col)
+    gene_exp_dt <- prepGeneExp(gene_exp, gene_col)
 
     return(gene_exp_dt)
 }
 
-#' readGeneExp
+#' prepGeneExp
 #'
-#' Function to set format of gene expression
+#' Prepare gene expression data for usage in monet
 #'
 #' @param gene_exp data or path to data.file.
 #' @param gene_col gene name column.
 #'
 #' @importFrom data.table fread setkeyv as.data.table setnames .N
 #' @importFrom dplyr nth
-readGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
+prepGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
     # TODO: if gene_col doesn't exist give warning
     if (!is.null(gene_col)) {
         gene_col <- testGeneCol(gene_col = gene_col, file_path = gene_exp)
@@ -43,7 +43,7 @@ readGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
     if ("character" %in% class(gene_exp)) {
         checkFile(gene_exp)
 
-        if (file.exists(gene_exp) & !is.null(gene_col)) {
+        if (!is.null(gene_col)) {
             gene_exp <- fread(gene_exp, key = gene_col)
         } else if (file.exists(gene_exp)) {
             gene_exp <- fread(gene_exp)
@@ -87,3 +87,4 @@ readGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
 
     return(gene_exp[, setnames(.SD, gene_col, "gene")])
 }
+
