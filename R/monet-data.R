@@ -21,6 +21,11 @@ monetInput <- function(gene_exp = NULL,
                        gene_atac = NULL) {
 
     gene_exp_dt <- prepGeneExp(gene_exp, gene_col)
+    if (is.null(gene_atac)) {
+        gene_atac <- gene_col
+    }
+
+    atac_seq_dt <- prepAtac()
 
     return(gene_exp_dt)
 }
@@ -32,7 +37,7 @@ monetInput <- function(gene_exp = NULL,
 #' @param gene_exp data or path to data.file.
 #' @param gene_col gene name column.
 #'
-#' @importFrom data.table fread setkeyv as.data.table setnames .N
+#' @importFrom data.table fread as.data.table setnames .N
 #' @importFrom dplyr nth
 prepGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
     # TODO: if gene_col doesn't exist give warning
@@ -55,13 +60,13 @@ prepGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
         if (!is.null(gene_col)) {
             gene_exp <-
                 gene_exp %>%
-                setkeyv(gene_col)
+                set_key_dt(gene_col)
         } else {
             message("No gene names provided using row number...\n")
             gene_exp <- gene_exp[, "gene" := 1:.N]
             gene_col <- "gene"
 
-            setkeyv(gene_exp, "gene")
+            set_key_dt(gene_exp, "gene")
         }
     } else if ("data.frame" %in% class(gene_exp)) {
         if (is.null(gene_col)) {
@@ -74,13 +79,13 @@ prepGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
                 as.data.table()
 
             gene_exp <- gene_exp[, "gene" := genes_v]
-            setkeyv(gene_exp, "gene")
+            set_key_dt(gene_exp, "gene")
         } else {
             gene_exp <-
                 gene_exp %>%
                 as.data.table()
 
-            setkeyv(gene_exp, gene_col)
+            set_key_dt(gene_exp, gene_col)
 
         }
     }
@@ -88,3 +93,68 @@ prepGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
     return(gene_exp[, setnames(.SD, gene_col, "gene")])
 }
 
+#' prepAtac
+#'
+#' prepare ATAC seq data for usage in monet
+#'
+#' @param atac_seq
+#' @param gene_col
+#'
+#' @importFrom data.table fread .N
+#'
+prepAtac <- function(atac_seq, gene_col = NULL) {
+    if (!is.null(gene_col)) {
+        gene_col <- testGeneCol(gene_col = gene_col, file_path = atac_seq)
+    }
+
+    if ("character" %in% class(atac_seq)) {
+    # atac_seq is a file
+        checkFile(atac_seq)
+
+        if (!is.null(gene_col)) {
+            gene_col <- testGeneCol(gene_col = gene_col, file_path = atac_seq)
+            atac_seq <- fread(atac_seq, key = gene_col)
+
+        } else {
+            atac_seq <- fread(atac_seq)
+
+            gene_col <- geneColCheck(atac_seq)
+            if (gene_col == "index") {
+                gene_col <- "gene"
+                atac_seq <- atac_seq[, "gene" := 1:.N]
+            }
+            set_key_dt(atac_seq, gene_col)
+
+        }
+
+    } else if ("data.table" %in% class(atac_seq)) {
+        if (is.null(gene_col)) {
+            gene_col <- geneColCheck(atac_seq)
+            if (gene_col == "index") {
+                gene_col <- "gene"
+                atac_seq <- atac_seq[, "gene" := 1:.N]
+            }
+        }
+
+        atac_seq <- set_key_dt(atac_seq, gene_col)
+    } else if ("data.frame" %in% class(atac_seq)) {
+        if (is.null(gene_col)) {
+            genes_v <- row.names(atac_seq)
+            gene_col <- "gene"
+            message("No gene_col provided for data.frame, using row names",
+                    "...")
+            atac_seq <-
+                atac_seq %>%
+                as.data.table()
+
+            atac_seq <- atac_seq[, "gene" := genes_v]
+            set_key_dt(atac_seq, "gene")
+        } else {
+            atac_seq <- as.data.table(atac_seq)
+
+            set_key_dt(atac_seq, gene_col)
+
+        }
+    }
+
+}
