@@ -46,11 +46,6 @@ checkFile <- function(file_path) {
 #' @importFrom dplyr nth
 #'
 testGeneCol <- function(gene_col, file_path) {
-    if (!is.integer(gene_col) | !is.character(gene_col)) {
-        stop("The gene column needs to be an integer location or the name.",
-             call. = FALSE)
-    }
-
     gene_num <- suppressWarnings(as.integer(gene_col))
 
     if (!is.na(gene_num)) {
