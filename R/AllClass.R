@@ -17,7 +17,12 @@ setClass("monet",
 
 #' MONET data input class
 #'
-#' @slot
+#' @slot gene_exp data.table. Gene expression time-course data.
+#' @slot atac_seq data.table. ATAC-seq data for each time-point.
+#' @slot no_tpts number of time-points.
+#' @slot no_genes number of genes in the data, derived from `gene_exp`.
+#' @slot no_tf_try number of trascription factors to try.
+#' @slot gene_names vector of gene.names.
 #'
 #' @export
 setClass("monetInput",
@@ -29,3 +34,14 @@ setClass("monetInput",
                       no_tf_try = "numeric",
                       gene_names = "vector"
                       ))
+
+#' MONET filtered data input class
+#'
+#'
+#' @slot exp_filt filtered list of gene
+#'
+#' @export
+setClass("monetInputFilt",
+         contains = "monetInput",
+         slots = list(exp_filt = "vector",
+                      atac_filt = "vector"))
