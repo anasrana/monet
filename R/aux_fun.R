@@ -19,6 +19,23 @@ NULL
 `:=` <- function(...) NULL
 
 
+#' Wrapper around file.exists
+#'
+#' Need NA return for monet if file does not exist.
+#'
+#' @param file_path File path to be tested.
+#'
+#' @return file_path or "NA"
+filePath <- function(file_path) {
+    if ("character" %in% class(file_path)) {
+        if (file.exists(file_path)) {
+            file_path
+        }
+    } else {
+        "NA"
+    }
+}
+
 #' Check if file exists
 #'
 #' Check if the specified file exists and give better error message.
