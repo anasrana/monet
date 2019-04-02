@@ -25,7 +25,7 @@ setClass("monet",
 #' @slot gene_names vector of gene.names.
 #'
 #' @export
-setClass("monetInput",
+setClass("monetData",
          contains = "monet",
          slots = list(gene_exp = "data.table",
                       atac_seq = "data.table",
@@ -41,7 +41,7 @@ setClass("monetInput",
 #' @slot exp_filt filtered list of gene
 #'
 #' @export
-setClass("monetInputFilt",
-         contains = "monetInput",
+setClass("monetDataFilt",
+         contains = "monetData",
          slots = list(exp_filt = "vector",
                       atac_filt = "vector"))

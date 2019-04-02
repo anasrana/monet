@@ -1,11 +1,11 @@
-#' initilize monetInput
+#' initilize monetData
 #'
-#' @param monetInput
+#' @param monetData
 #'
-#' @return  monetInput object
+#' @return  monetData object
 #'
 setMethod("initialize",
-          signature = "monetInput",
+          signature = "monetData",
           function(.Object,
                    gene_dt,
                    atac_dt,
@@ -28,20 +28,24 @@ setMethod("initialize",
     }
 )
 
-#' Print method for monetInput
+#' Print method for monetData
 #'
-#' @param monetInput
+#' @param monetData
 #'
 #' @export
 #'
-setMethod("show", "monetInput",
+setMethod("show", "monetData",
   function(object) {
     g_names <- object@gene_names
     cat("----------------------------------\n",
         "----- MONET input data class -----\n",
         object@no_genes, " genes and   ", object@no_tpts, " time-points\n",
         "----------------------------------\n")
-    cat("Genes names: ", g_names[1], ", ", g_names[2], "...",
+    if (object@gene_exp_path != "NA") {
+        cat("Data imported from: ", basename(object@gene_exp_path), "\n")
+        cat("Data imported from: ", basename(object@atac_seq_path), "\n")
+    }
+    cat("Genes names:\n", g_names[1], ", ", g_names[2], "...",
         g_names[length(g_names) - 1], ", ", g_names[length(g_names)], "\n")
     if (nrow(object@gene_exp) != nrow(object@atac_seq)) {
         warning("No of rows different between gene exp and atac seq\n",
@@ -59,7 +63,7 @@ setGeneric(name = "getGeneExp",
             standardGeneric("getGeneExp")
            })
 
-setGeneric(name = "getAtac",
+setGeneric(name = "getAtacSeq",
            def = function(.Object) {
-            standardGeneric("getAtac")
+            standardGeneric("getAtacSeq")
            })
