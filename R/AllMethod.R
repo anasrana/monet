@@ -10,9 +10,9 @@ setMethod("initialize",
                    gene_dt,
                    atac_dt,
                    gene_nm,
+                   gene_t0_dt,
                    gene_path = "NA",
-                   atac_path = "NA",
-                   no_tf = 30) {
+                   atac_path = "NA") {
     # assigning values
     .Object@gene_exp_path <- gene_path
     .Object@atac_seq_path <- atac_path
@@ -23,6 +23,11 @@ setMethod("initialize",
     .Object@no_genes <- tmp_dim[1]
     .Object@no_tpts <- tmp_dim[2] - 1
     .Object@gene_names <- gene_nm
+    .Object@gene_exp_init <- gene_t0_dt
+
+    .Object@data_test <-
+        all.equal(gene_dt[, "gene"], atac_dt[, "gene"],
+                  ignore.row.order = TRUE)
 
     return(.Object)
     }

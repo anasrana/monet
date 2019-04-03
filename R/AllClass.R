@@ -29,10 +29,11 @@ setClass("monetData",
          contains = "monet",
          slots = list(gene_exp = "data.table",
                       atac_seq = "data.table",
+                      gene_exp_init = "data.table",
                       no_tpts = "numeric",
                       no_genes = "numeric",
-                      no_tf_try = "numeric",
-                      gene_names = "vector"
+                      gene_names = "vector",
+                      data_test = "vector"
                       ))
 
 #' MONET filtered data input class

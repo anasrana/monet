@@ -1,6 +1,6 @@
-#' monetInput
+#' monetData initialize
 #'
-#' Function to initialise monetInput class
+#' Function to initialise monetData class
 #'
 #' @param gene_exp gene expression. Either path to gene expression file or
 #'  data.frame of gene expression. Rows represent genes and columns represent
@@ -10,24 +10,108 @@
 #' @param gene_atac column of gene names in atac_seq if different from
 #'  gene_col.
 #'
-#' @return monetInput class based on input to function.
+#' @return monetData class based on input to function.
+#'
+#' @importFrom data.table key .N
+#'
 #' @export
 #'
 #' @examples
 #'
-monetInput <- function(gene_exp = NULL,
-                       atac_seq = NULL,
-                       gene_col = NULL,
-                       gene_atac = NULL) {
+monetData_init <- function(gene_exp = NULL,
+                           atac_seq = NULL,
+                           gene_col = NULL,
+                           gene_atac = NULL,
+                           gene_exp0 = NULL) {
+
 
     gene_exp_dt <- prepGeneExp(gene_exp, gene_col)
+
+    # If there is no gene_atac variable overwrite with gene_col
     if (is.null(gene_atac)) {
         gene_atac <- gene_col
     }
 
-    atac_seq_dt <- prepAtac()
+    if (is.null(gene_exp0)) {
+        gene_exp0 <- gene_exp_dt[, -"gene"][, 1]
+        col_tf <- colnames(gene_exp0) != colnames(gene_exp_dt)
+        col_nm <- colnames(gene_exp_dt)[col_tf]
+        gene_exp_dt <- gene_exp_dt[, ..col_nm]
+    } else {
+        gene_exp0 <- prepExpT0(gene_exp0, gene_col)
+    }
 
-    return(gene_exp_dt)
+
+    atac_seq_dt <- prepAtac(atac_seq, gene_atac)
+    gene_names <- atac_seq_dt[, get(key(atac_seq_dt))]
+
+    if (!("character" %in% class(gene_exp))) {
+        gene_exp <- "NA"
+    }
+    if (!("character" %in% class(gene_atac))) {
+        gene_atac <- "NA"
+    }
+
+
+    monet_input <- new("monetData",
+                       gene_dt = gene_exp_dt,
+                       atac_dt = atac_seq_dt,
+                       gene_nm = gene_names,
+                       gene_t0_dt = gene_exp0,
+                       gene_path = gene_exp,
+                       atac_path = atac_seq)
+
+    return(monet_input)
+}
+
+#' Prepare gene expression at
+prepExpT0 <- function(gene_exp0 = NULL, gene_col = NULL) {
+    if ("character" %in% class(gene_exp0)) {
+        checkFile(gene_exp0)
+        if (!is.null(gene_col)) {
+            gene_exp0 <- fread(gene_exp0, key = gene_col)
+        } else if (file.exists(gene_exp0)) {
+            gene_exp0 <- fread(gene_exp0)
+            message("No gene names provided using row number ...\n")
+            gene_exp0 <- gene_exp0[, "gene" := 1:.N]
+            gene_col <- "gene"
+            set_key_dt(gene_exp0, gene_col)
+        }
+    } else if ("data.table" %in% class(gene_exp0)) {
+        if (!is.null(gene_col)) {
+            gene_exp0 <-
+                gene_exp0 %>%
+                set_key_dt(gene_col)
+        } else {
+            message("No gene names provided using row number...\n")
+            gene_exp0 <- gene_exp0[, "gene" := 1:.N]
+            gene_col <- "gene"
+
+            set_key_dt(gene_exp0, gene_col)
+        }
+    } else if ("data.frame" %in% class(gene_exp0)) {
+        if (is.null(gene_col)) {
+            genes_v <- row.names(gene_exp0)
+            gene_col <- "gene"
+            message("No gene_col provided for data.frame, using row names",
+                    "...")
+            gene_exp0 <-
+                gene_exp0 %>%
+                as.data.table()
+
+            gene_exp0 <- gene_exp0[, "gene" := genes_v]
+            set_key_dt(gene_exp0, "gene")
+        } else {
+            gene_exp0 <-
+                gene_exp0 %>%
+                as.data.table()
+
+            set_key_dt(gene_exp0, gene_col)
+
+        }
+    }
+
+    return(gene_exp0[, setnames(.SD, gene_col, "gene")])
 }
 
 #' prepGeneExp
@@ -156,5 +240,7 @@ prepAtac <- function(atac_seq, gene_col = NULL) {
 
         }
     }
+
+    return(atac_seq[, setnames(.SD, gene_col, "gene")])
 
 }
