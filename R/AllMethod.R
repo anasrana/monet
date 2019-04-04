@@ -1,3 +1,7 @@
+# =============================================================================
+# Initialising classes
+# =============================================================================
+
 #' initilize monetData
 #'
 #' @param monetData
@@ -32,6 +36,10 @@ setMethod("initialize",
     return(.Object)
     }
 )
+
+# =============================================================================
+# Printing methods
+# =============================================================================
 
 #' Print method for monetData
 #'
@@ -72,3 +80,48 @@ setGeneric(name = "getAtacSeq",
            def = function(.Object) {
             standardGeneric("getAtacSeq")
            })
+
+setGeneric(name = "setDataTest",
+           def = function(.Object, data_test) {
+            standardGeneric("setDataTest")
+           })
+
+# =============================================================================
+# GENERIC implemented
+# =============================================================================
+
+#' Extract gene expression slot
+#'
+#' @param monetData monetData class object.
+#'
+#' @export
+#'
+setMethod(f = "getGeneExp",
+          signature = "monetData",
+          definition = function(.Object) {
+            gene_exp <- .Object@gene_exp
+            return(gene_exp)
+          })
+#' Extract ATACseq slot
+#'
+#' @param monetData monetData class object.
+#'
+#' @export
+setMethod(f = "getAtacSeq",
+          signature = "monetData",
+          definition = function(.Object) {
+            return(.Object@atac_seq)
+          })
+
+#' Update data_test slot
+#'
+#' @param monetData monetData class object.
+#' @param data_test new data_test entry.
+#'
+#' @export
+setMethod(f = "setDataTest",
+          signature = "monetData",
+          definition = function(.Object, data_test) {
+            .Object@data_test <- data_test
+            return(.Object)
+          })
