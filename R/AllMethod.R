@@ -151,6 +151,7 @@ setMethod(f = "getGeneExp",
             gene_exp <- .Object@gene_exp
             return(gene_exp)
           })
+
 #' Extract ATACseq slot
 #'
 #' @param monetData monetData class object.

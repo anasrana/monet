@@ -11,6 +11,8 @@
 #'  in gene expression.
 #'
 #' @export
+#'
+#' @importFrom data.table melt setkeyv
 monet_data_filter <- function(monet_data,
                         gene_filt = NULL,
                         noise_flt = NULL,
@@ -28,13 +30,13 @@ monet_data_filter <- function(monet_data,
     } else if (!is.null(gene_filt)) {
         message("Checking gene list against RNAseq and ATACseq")
         gene_list <- overlapGenes(gene_dt[gene_filt], atac_dt[gene_filt])
-    } else if (!is.null(gene_filt)) {
+    } else if (!is.null(noise_flt)) {
         gene_mlt <-
         melt(gene_dt,
              id.vars = "gene",
              variable.name = "t_point",
              value.name = "g_exp") %>%
-        setkey("gene")
+        setkeyv("gene")
 
         gn_v <-
         gene_mlt[, .(mu = mean(g_exp), sig = sd(g_exp)), by = "gene"
@@ -48,7 +50,7 @@ monet_data_filter <- function(monet_data,
              id.vars = "gene",
              variable.name = "t_point",
              value.name = "g_exp") %>%
-        setkey("gene")
+        setkeyv("gene")
 
         gn_v <-
         gene_mlt[, .(mu = mean(g_exp), sig = sd(g_exp)), by = "gene"
