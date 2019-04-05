@@ -37,6 +37,27 @@ setMethod("initialize",
     }
 )
 
+#' initialize monetDataFilt
+#'
+setMethod("initialize",
+          signature = "monetDataFilt",
+          function(.Object,
+                   monetData,
+                   gene_filt) {
+    # import from existing class
+    .Object@gene_exp_path <- monetData@gene_exp_path
+    .Object@atac_seq_path <- monetData@atac_seq_path
+    .Object@atac_seq <- monetData@atac_seq
+    .Object@gene_exp <- monetData@gene_exp
+    .Object@no_genes <- monetData@no_genes
+    .Object@no_tpts <- monetData@no_tpts
+    .Object@gene_names <- monetData@gene_names
+    .Object@gene_exp_init <- monetData@gene_exp_init
+    .Object@data_test <- TRUE
+    .Object@gene_overlap_list <- gene_filt
+    return(.Object)
+          })
+
 # =============================================================================
 # Printing methods
 # =============================================================================
@@ -50,7 +71,7 @@ setMethod("initialize",
 setMethod("show", "monetData",
   function(object) {
     g_names <- object@gene_names
-    cat("----------------------------------\n",
+    cat("------------------------------------\n",
         "----- MONET input data class -----\n",
         object@no_genes, " genes and   ", object@no_tpts, " time-points\n",
         "----------------------------------\n")
@@ -60,7 +81,35 @@ setMethod("show", "monetData",
     }
     cat("Genes names:\n", g_names[1], ", ", g_names[2], "...",
         g_names[length(g_names) - 1], ", ", g_names[length(g_names)], "\n")
-    if (nrow(object@gene_exp) != nrow(object@atac_seq)) {
+    if (object@data_test != TRUE) {
+        warning("No of rows different between gene exp and atac seq\n",
+                "MONET won't run until the data has been filtered",
+                call. = FALSE)
+    }
+  })
+
+#' Print method for monetDataFilt
+#'
+#' @param monetDataFilt
+#'
+#' @export
+#'
+setMethod("show", "monetDataFilt",
+  function(object) {
+    g_names <- object@gene_names
+    cat("------------------------------------\n",
+        "------------ FILTERED -------------\n",
+        "----- MONET input data class -----\n",
+        length(object@gene_overlap_list), "of", object@no_genes,
+        "genes and   ", object@no_tpts, " time-points\n",
+        "----------------------------------\n")
+    if (object@gene_exp_path != "NA") {
+        cat("Data imported from: ", basename(object@gene_exp_path), "\n")
+        cat("Data imported from: ", basename(object@atac_seq_path), "\n")
+    }
+    cat("Genes names:\n", g_names[1], ", ", g_names[2], "...",
+        g_names[length(g_names) - 1], ", ", g_names[length(g_names)], "\n")
+    if (object@data_test != TRUE) {
         warning("No of rows different between gene exp and atac seq\n",
                 "MONET won't run until the data has been filtered",
                 call. = FALSE)
