@@ -54,7 +54,7 @@ setMethod("initialize",
     .Object@gene_names <- monetData@gene_names
     .Object@gene_exp_init <- monetData@gene_exp_init
     .Object@data_test <- TRUE
-    .Object@gene_overlap_list <- gene_filt
+    .Object@gene_filt_list <- gene_filt
     return(.Object)
           })
 
@@ -100,7 +100,7 @@ setMethod("show", "monetDataFilt",
     cat("------------------------------------\n",
         "------------ FILTERED -------------\n",
         "----- MONET input data class -----\n",
-        length(object@gene_overlap_list), "of", object@no_genes,
+        length(object@gene_filt_list), "of", object@no_genes,
         "genes and   ", object@no_tpts, " time-points\n",
         "----------------------------------\n")
     if (object@gene_exp_path != "NA") {

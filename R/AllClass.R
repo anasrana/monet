@@ -44,4 +44,4 @@ setClass("monetData",
 #' @export
 setClass("monetDataFilt",
          contains = "monetData",
-         slots = list(gene_overlap_list = "vector"))
+         slots = list(gene_filt_list = "vector"))
