@@ -34,8 +34,9 @@ monetData_init <- function(gene_exp = NULL,
 
     if (is.null(gene_exp0)) {
         gene_exp0 <- gene_exp_dt[, -"gene"][, 1]
+        gene_exp0 <- cbind(gene_exp_dt[, "gene"], gene_exp0)
         col_tf <- colnames(gene_exp0) != colnames(gene_exp_dt)
-        col_nm <- colnames(gene_exp_dt)[col_tf]
+        col_nm <- c("gene", colnames(gene_exp_dt)[col_tf])
         gene_exp_dt <- gene_exp_dt[, ..col_nm]
     } else {
         gene_exp0 <- prepExpT0(gene_exp0, gene_col)
@@ -52,6 +53,19 @@ monetData_init <- function(gene_exp = NULL,
         gene_atac <- "NA"
     }
 
+    if (ncol(atac_seq_dt) != ncol(gene_exp_dt)) {
+
+        name_int <- intersect(colnames(atac_seq_dt[, -c("gene")]),
+            colnames(gene_exp_dt[, -c("gene")]))
+
+        if (length(name_int) == 0) {
+            stop("Mismatch in time points between RNAseq and ATACseq.\n",
+                 "Ensure you provide gene expression at t = 0 separately.")
+        } else {
+            gene_exp_dt <- gene_exp_dt[, ..name_int]
+            atac_seq_dt <- atac_seq_dt[, ..name_int]
+        }
+    }
 
     monet_input <- new("monetData",
                        gene_dt = gene_exp_dt,
