@@ -195,8 +195,9 @@ prepGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
 #'
 #' prepare ATAC seq data for usage in monet
 #'
-#' @param atac_seq
-#' @param gene_col
+#' @param atac_seq file path or data.
+#' @param gene_col character (defaul is `NULL`). Column name (file or data
+#'  object) containing gene names.
 #'
 #' @importFrom data.table fread .N
 #'
