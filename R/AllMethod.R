@@ -58,6 +58,54 @@ setMethod("initialize",
     return(.Object)
           })
 
+#' initialize monetOptim class
+#'
+#' @param monetOptim
+#'
+#' @return monetOptim object
+#'
+#' @importFrom magrittr set_colnames set_rownames set_names
+#' @importFrom stringr str_c
+#'
+setMethod("initialize",
+          signature = "monetOptim",
+          function(.Object,
+                   optim_out,
+                   monet_dat) {
+    # extract parameters
+    x_mat <- optim_out$par[grepl("x", names(optim_out$par))]
+    b_mat <- optim_out$par[grepl("b", names(optim_out$par))]
+    w_vec <- optim_out$par[grepl("w", names(optim_out$par))]
+
+    if (class(monet_dat) == "monetData") {
+        g_names <- monet_dat@gene_names
+    } else if (class(monet_dat) == "monetDataFilt") {
+        g_names <- monet_dat@gene_filt_list
+    }
+    no_tf <- length(w_vec)
+    no_tpts <- monet_dat@no_tpts
+    no_gns <- length(g_names)
+
+    x_mat <- matrix(x_mat, nrow = no_tpts, ncol = no_tf, byrow = F) %>%
+        set_colnames(stringr::str_c("TF.", 1:no_tf)) %>%
+        set_rownames(stringr::str_c("t = ", 1:no_tpts))
+
+    b_mat <- matrix(b_mat, nrow = no_gns, ncol = no_tf, byrow = F) %>%
+        set_colnames(stringr::str_c("TF.", 1:no_tf)) %>%
+        set_rownames(g_names)
+
+    w_vec <- w_vec %>%
+        set_names(stringr::str_c("TF.", 1:no_tf))
+
+    .Object@x_fit <- x_mat
+    .Object@b_fit <- b_mat
+    .Object@w <- w_vec
+    .Object@gene_names <- g_names
+    .Object@rstan_optim <- optim_out
+
+    return(.Object)
+          })
+
 # =============================================================================
 # Printing methods
 # =============================================================================
