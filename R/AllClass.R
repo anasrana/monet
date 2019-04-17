@@ -52,14 +52,14 @@ setClass("monetDataFilt",
 
 #' MONET optimization output class
 #'
-#' @slot x_fit matrix
-#' @slot b_fit matrix
+#' @slot x_est matrix
+#' @slot b_est matrix
 #' @slot w vector.
 #'
 #' @export
 setClass("monetOptim",
-         slots = list(x_fit = "matrix",
-                      b_fit = "matrix",
+         slots = list(x_est = "matrix",
+                      b_est = "matrix",
                       w = "vector",
                       gene_names = "vector",
                       rstan_optim = "list"))

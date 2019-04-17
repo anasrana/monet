@@ -97,8 +97,8 @@ setMethod("initialize",
     w_vec <- w_vec %>%
         set_names(stringr::str_c("TF.", 1:no_tf))
 
-    .Object@x_fit <- x_mat
-    .Object@b_fit <- b_mat
+    .Object@x_est <- x_mat
+    .Object@b_est <- b_mat
     .Object@w <- w_vec
     .Object@gene_names <- g_names
     .Object@rstan_optim <- optim_out
