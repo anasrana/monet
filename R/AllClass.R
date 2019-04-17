@@ -45,3 +45,21 @@ setClass("monetData",
 setClass("monetDataFilt",
          contains = "monetData",
          slots = list(gene_filt_list = "vector"))
+
+# ============================================================================
+# MONET fit class
+# ============================================================================
+
+#' MONET optimization output class
+#'
+#' @slot x_fit matrix
+#' @slot b_fit matrix
+#' @slot w vector.
+#'
+#' @export
+setClass("monetOptim",
+         slots = list(x_fit = "matrix",
+                      b_fit = "matrix",
+                      w = "vector",
+                      gene_names = "vector",
+                      rstan_optim = "list"))
