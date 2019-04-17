@@ -1,3 +1,11 @@
+# rstan
+src/stan_files/*.o
+src/stan_files/*.cc
+src/stan_files/*.hpp
+src/monet.so
+src/monet.dll
+src/init.o
+
 # History files
 .Rhistory
 .Rapp.history
