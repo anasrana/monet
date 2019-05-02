@@ -21,11 +21,12 @@
 monetData_init <- function(gene_exp = NULL,
                            atac_seq = NULL,
                            gene_col = NULL,
+                           trnsfrm_ge = c("asinh", "log", "none"),
                            gene_atac = NULL,
                            gene_exp0 = NULL) {
 
-
-    gene_exp_dt <- prepGeneExp(gene_exp, gene_col)
+    trnsfrm_ge <- match.arg(trnsfrm_ge)
+    gene_exp_dt <- prepGeneExp(gene_exp, gene_col, trnsfrm_ge)
 
     # If there is no gene_atac variable overwrite with gene_col
     if (is.null(gene_atac)) {
@@ -79,7 +80,8 @@ monetData_init <- function(gene_exp = NULL,
 }
 
 #' Prepare gene expression at
-prepExpT0 <- function(gene_exp0 = NULL, gene_col = NULL) {
+prepExpT0 <- function(gene_exp0 = NULL, gene_col = NULL,
+                      trnsfrm_ge = "asinh") {
     if ("character" %in% class(gene_exp0)) {
         checkFile(gene_exp0)
         if (!is.null(gene_col)) {
@@ -124,8 +126,8 @@ prepExpT0 <- function(gene_exp0 = NULL, gene_col = NULL) {
 
         }
     }
-
-    return(gene_exp0[, setnames(.SD, gene_col, "gene")])
+    trnsfrmGe(gene_exp0, trnsfrm_ge)[, setnames(.SD, gene_col, "gene")] %>%
+        return()
 }
 
 #' prepGeneExp
@@ -137,7 +139,8 @@ prepExpT0 <- function(gene_exp0 = NULL, gene_col = NULL) {
 #'
 #' @importFrom data.table fread as.data.table setnames .N
 #' @importFrom dplyr nth
-prepGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
+prepGeneExp <- function(gene_exp = NULL, gene_col = NULL,
+                        trnsfrm_ge = "asinh") {
     # TODO: if gene_col doesn't exist give warning
     if (!is.null(gene_col)) {
         gene_col <- testGeneCol(gene_col = gene_col, file_path = gene_exp)
@@ -188,7 +191,8 @@ prepGeneExp <- function(gene_exp = NULL, gene_col = NULL) {
         }
     }
 
-    return(gene_exp[, setnames(.SD, gene_col, "gene")])
+    trnsfrmGe(gene_exp, trnsfrm_ge)[, setnames(.SD, gene_col, "gene")] %>%
+        return()
 }
 
 #' prepAtac

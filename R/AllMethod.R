@@ -8,6 +8,8 @@
 #'
 #' @return  monetData object
 #'
+#' @importFrom data.table melt dcast setkeyv
+#'
 setMethod("initialize",
           signature = "monetData",
           function(.Object,
@@ -21,17 +23,44 @@ setMethod("initialize",
     .Object@gene_exp_path <- gene_path
     .Object@atac_seq_path <- atac_path
     .Object@atac_seq <- atac_dt
-    .Object@gene_exp <- gene_dt
     # calcualte based on supplied varaible
-    tmp_dim <- dim(gene_dt)
-    .Object@no_genes <- tmp_dim[1]
-    .Object@no_tpts <- tmp_dim[2] - 1
-    .Object@gene_names <- gene_nm
-    .Object@gene_exp_init <- gene_t0_dt
+
+    tmp_noG <- nrow(gene_dt)
+
+    g0_name <- colnames(gene_t0_dt)[2]
+    g_cname <- colnames(gene_dt)
+    sd_test <-
+        gene_dt[gene_t0_dt, nomatch = NA] %>%
+        melt(id.vars = "gene") %>%
+        setkeyv("gene")
+
+    gene_dt <-
+    sd_test[, sd_v := sd(value), by = "gene"
+          ][sd_v > 0.1 # TODO: add as an option
+          ][, value := (value - mean(value)) / sd_v, by = "gene"] %>%
+          dcast(gene ~ variable) %>%
+          setkeyv("gene")
+
+    if(nrow(gene_dt) != tmp_noG) {
+        message("\n", tmp_noG - nrow(gene_dt),
+                " genes with small sd removed.\n")
+        gene_nm <- gene_dt[, get("gene")]
+    }
+
+    init_nm <- c("gene", g0_name)
+    gene_t0_dt <- gene_dt[, ..init_nm]
+    gene_dt <- gene_dt[, ..g_cname]
 
     .Object@data_test <-
         all.equal(gene_dt[, "gene"], atac_dt[, "gene"],
                   ignore.row.order = TRUE)
+
+    tmp_dim <- dim(gene_dt)
+    .Object@gene_exp <- gene_dt
+    .Object@gene_exp_init <- gene_t0_dt
+    .Object@no_genes <- tmp_dim[1]
+    .Object@no_tpts <- tmp_dim[2] - 1
+    .Object@gene_names <- gene_nm
 
     return(.Object)
     }

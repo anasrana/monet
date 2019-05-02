@@ -125,3 +125,27 @@ set_key_dt <- function(data_dt, col_name) {
                         "' not found in the data.")
              })
 }
+
+#' Transforming data function
+#'
+#' helper function
+#' @param data_dt data.table. A `data.table` object of gene expression.
+#' @param trnsfrm_ge character.
+#'
+#' @importFrom data.table key
+trnsfrmGe <- function(data_dt, trnsfrm_ge) {
+    data_key <- key(data_dt)
+    if (trnsfrm_ge == "none") {
+        return(data_dt)
+    } else if (trnsfrm_ge == "asinh") {
+        cbind(data_dt[, ..data_key], asinh(data_dt[, -..data_key])) %>%
+            return()
+    } else if (trnsfrm_ge == "log") {
+        cbind(data_dt[, ..data_key], log2(data_dt[, -..data_key]) + 1) %>%
+            return()
+    } else {
+        stop("Transformation (", trnsfrm_ge, ") not implemented in monet.\n",
+             "Contact the developer (a.a.rana@bham.ac.uk) if you think it",
+             " should be implemented")
+    }
+}

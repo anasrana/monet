@@ -12,7 +12,6 @@
 #'
 #' @export
 monet_input_prep <- function(monet_class,
-                             trnsfrm_ge = c("asinh", "log", "none"),
                              par_list = list()) {
     # only possible list name
     list_nm <- c("no_tf", "de_b", "sigma", "sigma_x", "alpha")
@@ -23,7 +22,6 @@ monet_input_prep <- function(monet_class,
                         "sigma_x" = 1,
                         "alpha" = 1)
 
-    trnsfrm_ge <- match.arg(trnsfrm_ge)
     if (!all(names(par_list) %in% list_nm)) {
         not_found <- setdiff(names(par_list), list_nm)
         stop("Not all parameters provided are from the list:",
@@ -56,16 +54,9 @@ monet_input_prep <- function(monet_class,
     par_list[["no_tpt"]] <- ncol(atac_dt)
     par_list[["a"]] <- t(as.matrix(atac_dt))
 
-    if (trnsfrm_ge == "none") {
-        par_list[["y"]] <- t(as.matrix(gene_dt))
-        par_list[["y0"]] <- gene_init
-    } else if (trnsfrm_ge == "log") {
-        par_list[["y"]] <- log10(t(as.matrix(gene_dt)) + 1)
-        par_list[["y0"]] <- log10(gene_init + 1)
-    } else if (trnsfrm_ge == "asinh") {
-        par_list[["y"]] <- asinh(t(as.matrix(gene_dt)))
-        par_list[["y0"]] <- asinh(gene_init)
-    }
+    par_list[["y"]] <- t(as.matrix(gene_dt))
+    par_list[["y0"]] <- gene_init
+
     return(par_list)
 
 }
