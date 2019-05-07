@@ -2,16 +2,16 @@
 # Initialising classes
 # =============================================================================
 
-#' initilize monetData
+#' initilize monetDataRaw
 #'
-#' @param monetData
+#' @param monetDataRaw
 #'
-#' @return  monetData object
+#' @return  monetDataRaw object
 #'
 #' @importFrom data.table melt dcast setkeyv
 #'
 setMethod("initialize",
-          signature = "monetData",
+          signature = "monetDataRaw",
           function(.Object,
                    gene_dt,
                    atac_dt,
@@ -19,6 +19,7 @@ setMethod("initialize",
                    gene_t0_dt,
                    gene_path = "NA",
                    atac_path = "NA") {
+
     # assigning values
     .Object@gene_exp_path <- gene_path
     .Object@atac_seq_path <- atac_path
@@ -36,10 +37,9 @@ setMethod("initialize",
 
     gene_dt <-
     sd_test[, sd_v := sd(value), by = "gene"
-          ][sd_v > 0.1 # TODO: add as an option
-          ][, value := (value - mean(value)) / sd_v, by = "gene"] %>%
-          dcast(gene ~ variable) %>%
-          setkeyv("gene")
+          ][sd_v > 0.1
+          ][, -"sd_v"] %>%
+          dcast(gene ~ variable)
 
     if(nrow(gene_dt) != tmp_noG) {
         message("\n", tmp_noG - nrow(gene_dt),
@@ -66,22 +66,25 @@ setMethod("initialize",
     }
 )
 
-#' initialize monetDataFilt
+#' initialize monetData
 #'
 setMethod("initialize",
-          signature = "monetDataFilt",
+          signature = "monetData",
           function(.Object,
-                   monetData,
+                   monetDataRaw,
                    gene_filt) {
+      #   [, value := (value - mean(value)) / sd_v, by = "gene"] %>%
+      # dcast(gene ~ variable) %>%
+      # setkeyv("gene")
     # import from existing class
-    .Object@gene_exp_path <- monetData@gene_exp_path
-    .Object@atac_seq_path <- monetData@atac_seq_path
-    .Object@atac_seq <- monetData@atac_seq
-    .Object@gene_exp <- monetData@gene_exp
-    .Object@no_genes <- monetData@no_genes
-    .Object@no_tpts <- monetData@no_tpts
-    .Object@gene_names <- monetData@gene_names
-    .Object@gene_exp_init <- monetData@gene_exp_init
+    .Object@gene_exp_path <- monetDataRaw@gene_exp_path
+    .Object@atac_seq_path <- monetDataRaw@atac_seq_path
+    .Object@atac_seq <- monetDataRaw@atac_seq
+    .Object@gene_exp <- monetDataRaw@gene_exp
+    .Object@no_genes <- monetDataRaw@no_genes
+    .Object@no_tpts <- monetDataRaw@no_tpts
+    .Object@gene_names <- monetDataRaw@gene_names
+    .Object@gene_exp_init <- monetDataRaw@gene_exp_init
     .Object@data_test <- TRUE
     .Object@gene_filt_list <- gene_filt
     return(.Object)
@@ -139,17 +142,17 @@ setMethod("initialize",
 # Printing methods
 # =============================================================================
 
-#' Print method for monetData
+#' Print method for monetDataRaw
 #'
-#' @param monetData
+#' @param monetDataRaw
 #'
 #' @export
 #'
-setMethod("show", "monetData",
+setMethod("show", "monetDataRaw",
   function(object) {
     g_names <- object@gene_names
     cat("------------------------------------\n",
-        "----- MONET input data class -----\n",
+        "---- MONET Raw input data class ----\n",
         object@no_genes, " genes and   ", object@no_tpts, " time-points\n",
         "----------------------------------\n")
     if (object@gene_exp_path != "NA") {
@@ -165,13 +168,13 @@ setMethod("show", "monetData",
     }
   })
 
-#' Print method for monetDataFilt
+#' Print method for monetData
 #'
-#' @param monetDataFilt
+#' @param monetData
 #'
 #' @export
 #'
-setMethod("show", "monetDataFilt",
+setMethod("show", "monetData",
   function(object) {
     g_names <- object@gene_names
     cat("------------------------------------\n",
@@ -223,7 +226,7 @@ setGeneric(name = "setDataTest",
 #' @export
 #'
 setMethod(f = "getGeneExp",
-          signature = "monetData",
+          signature = "monetDataRaw",
           definition = function(.Object) {
             gene_exp <- .Object@gene_exp
             return(gene_exp)
@@ -235,7 +238,7 @@ setMethod(f = "getGeneExp",
 #'
 #' @export
 setMethod(f = "getAtacSeq",
-          signature = "monetData",
+          signature = "monetDataRaw",
           definition = function(.Object) {
             return(.Object@atac_seq)
           })
@@ -247,7 +250,7 @@ setMethod(f = "getAtacSeq",
 #'
 #' @export
 setMethod(f = "setDataTest",
-          signature = "monetData",
+          signature = "monetDataRaw",
           definition = function(.Object, data_test) {
             .Object@data_test <- data_test
             return(.Object)

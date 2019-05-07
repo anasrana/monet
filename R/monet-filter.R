@@ -17,7 +17,7 @@ monet_data_filter <- function(monet_data,
                         gene_filt = NULL,
                         noise_flt = NULL,
                         no_genes = NULL) {
-    if (!("monetData" %in% class(monet_data))) {
+    if (!("monetDataRaw" %in% class(monet_data))) {
         stop("monet_data has to be a monetData class")
     }
 
@@ -61,7 +61,7 @@ monet_data_filter <- function(monet_data,
         gene_list <- overlapGenes(gene_dt[gn_v], atac_dt[gn_v])
     }
 
-    monet_filt <- new("monetDataFilt",
+    monet_filt <- new("monetData",
                       monet_data,
                       gene_list)
 

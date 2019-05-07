@@ -21,11 +21,11 @@
 monetData_init <- function(gene_exp = NULL,
                            atac_seq = NULL,
                            gene_col = NULL,
-                           trnsfrm_ge = c("asinh", "log", "none"),
+                           transform = c("asinh", "log", "none"),
                            gene_atac = NULL,
                            gene_exp0 = NULL) {
 
-    trnsfrm_ge <- match.arg(trnsfrm_ge)
+    trnsfrm_ge <- match.arg(transform)
     gene_exp_dt <- prepGeneExp(gene_exp, gene_col, trnsfrm_ge)
 
     # If there is no gene_atac variable overwrite with gene_col
@@ -68,7 +68,7 @@ monetData_init <- function(gene_exp = NULL,
         }
     }
 
-    monet_input <- new("monetData",
+    monet_input <- new("monetDataRaw",
                        gene_dt = gene_exp_dt,
                        atac_dt = atac_seq_dt,
                        gene_nm = gene_names,
