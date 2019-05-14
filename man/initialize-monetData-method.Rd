@@ -3,17 +3,10 @@
 \docType{methods}
 \name{initialize,monetData-method}
 \alias{initialize,monetData-method}
-\title{initilize monetData}
+\title{initialize monetData}
 \usage{
-\S4method{initialize}{monetData}(.Object, gene_dt, atac_dt, gene_nm,
-  gene_t0_dt, gene_path = "NA", atac_path = "NA")
-}
-\arguments{
-\item{monetData}{}
-}
-\value{
-monetData object
+\S4method{initialize}{monetData}(.Object, monetDataRaw, gene_filt)
 }
 \description{
-initilize monetData
+initialize monetData
 }

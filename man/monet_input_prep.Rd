@@ -4,8 +4,7 @@
 \alias{monet_input_prep}
 \title{Monet input prep}
 \usage{
-monet_input_prep(monet_class, trnsfrm_ge = c("asinh", "log", "none"),
-  par_list = list())
+monet_input_prep(monet_class, par_list = list())
 }
 \arguments{
 \item{monet_class}{monet data class. Possibilities include \code{monetData} or

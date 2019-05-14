@@ -4,7 +4,7 @@
 \alias{prepExpT0}
 \title{Prepare gene expression at}
 \usage{
-prepExpT0(gene_exp0 = NULL, gene_col = NULL)
+prepExpT0(gene_exp0 = NULL, gene_col = NULL, trnsfrm_ge = "asinh")
 }
 \description{
 Prepare gene expression at

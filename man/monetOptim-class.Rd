@@ -10,9 +10,9 @@ MONET optimization output class
 \section{Slots}{
 
 \describe{
-\item{\code{x_fit}}{matrix}
+\item{\code{x_est}}{matrix}
 
-\item{\code{b_fit}}{matrix}
+\item{\code{b_est}}{matrix}
 
 \item{\code{w}}{vector.}
 }}

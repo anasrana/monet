@@ -4,7 +4,7 @@
 \alias{prepGeneExp}
 \title{prepGeneExp}
 \usage{
-prepGeneExp(gene_exp = NULL, gene_col = NULL)
+prepGeneExp(gene_exp = NULL, gene_col = NULL, trnsfrm_ge = "asinh")
 }
 \arguments{
 \item{gene_exp}{data or path to data.file.}

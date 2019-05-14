@@ -129,6 +129,7 @@ set_key_dt <- function(data_dt, col_name) {
 #' Transforming data function
 #'
 #' helper function
+#'
 #' @param data_dt data.table. A `data.table` object of gene expression.
 #' @param trnsfrm_ge character.
 #'
@@ -148,4 +149,51 @@ trnsfrmGe <- function(data_dt, trnsfrm_ge) {
              "Contact the developer (a.a.rana@bham.ac.uk) if you think it",
              " should be implemented")
     }
+}
+
+#' Melt gene_dt
+#'
+#' Reshape the gene_dt object and prepare for filtering
+#'
+#' @param gene_dt data.table. FPKM transformed gene expression data.table.
+#' @param mu_th numeric. Threshold for mean values.
+#' @param sd_th numeric. Threshold for sd values.
+#'
+#' @importFrom data.table melt setkeyv
+#'
+geneDtMelt <- function(gene_dt, mu_th = 0.1, sd_th = 0.1) {
+    no_gene <- nrow(gene_dt)
+    gene_melt <-
+        gene_dt %>%
+        melt(id.vars = "gene") %>%
+        setkeyv("gene")
+
+    gene_melt <-
+    gene_melt[, c("sd_v", "mu_v") :=
+                .(sd(value, na.rm = TRUE), mean(value, na.rm = TRUE)),
+                by = "gene"
+          ][, sn := mu_v / sd_v
+          ][mu_v > mu_th & sd_v > sd_th]
+
+    no_gn <- length(unique(gene_melt$gene))
+
+    if (no_gn < no_gene) {
+        message(no_gene - no_gn, " genes removed due to lack of variation or ",
+         "very low expression")
+    }
+
+    return(gene_melt)
+}
+
+
+#' standardise gene expression
+#'
+#' standardise gene expression in long format.
+#'
+#' @param gene_long data.table.
+#'
+geneStanderdise <- function(gene_long) {
+gene_long[, value := (value - mean(value, na.rm = TRUE)) /
+                        sd(value, na.rm = TRUE), by = "gene"]
+
 }

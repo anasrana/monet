@@ -8,7 +8,6 @@
 #'
 #' @return  monetDataRaw object
 #'
-#' @importFrom data.table melt dcast setkeyv
 #'
 setMethod("initialize",
           signature = "monetDataRaw",
@@ -30,26 +29,6 @@ setMethod("initialize",
 
     g0_name <- colnames(gene_t0_dt)[2]
     g_cname <- colnames(gene_dt)
-    sd_test <-
-        gene_dt[gene_t0_dt, nomatch = NA] %>%
-        melt(id.vars = "gene") %>%
-        setkeyv("gene")
-
-    gene_dt <-
-    sd_test[, sd_v := sd(value), by = "gene"
-          ][sd_v > 0.1
-          ][, -"sd_v"] %>%
-          dcast(gene ~ variable)
-
-    if(nrow(gene_dt) != tmp_noG) {
-        message("\n", tmp_noG - nrow(gene_dt),
-                " genes with small sd removed.\n")
-        gene_nm <- gene_dt[, get("gene")]
-    }
-
-    init_nm <- c("gene", g0_name)
-    gene_t0_dt <- gene_dt[, ..init_nm]
-    gene_dt <- gene_dt[, ..g_cname]
 
     .Object@data_test <-
         all.equal(gene_dt[, "gene"], atac_dt[, "gene"],
@@ -119,15 +98,15 @@ setMethod("initialize",
     no_gns <- length(g_names)
 
     x_mat <- matrix(x_mat, nrow = no_tpts, ncol = no_tf, byrow = F) %>%
-        set_colnames(stringr::str_c("TF.", 1:no_tf)) %>%
-        set_rownames(stringr::str_c("t = ", 1:no_tpts))
+        set_colnames(str_c("TF.", 1:no_tf)) %>%
+        set_rownames(str_c("t = ", 1:no_tpts))
 
     b_mat <- matrix(b_mat, nrow = no_gns, ncol = no_tf, byrow = F) %>%
-        set_colnames(stringr::str_c("TF.", 1:no_tf)) %>%
+        set_colnames(str_c("TF.", 1:no_tf)) %>%
         set_rownames(g_names)
 
     w_vec <- w_vec %>%
-        set_names(stringr::str_c("TF.", 1:no_tf))
+        set_names(str_c("TF.", 1:no_tf))
 
     .Object@x_est <- x_mat
     .Object@b_est <- b_mat
@@ -210,9 +189,25 @@ setGeneric(name = "getAtacSeq",
             standardGeneric("getAtacSeq")
            })
 
+setGeneric(name = "getGeneInit",
+           def = function(.Object) {
+            standardGeneric("getGeneInit")
+           })
+
+
 setGeneric(name = "setDataTest",
            def = function(.Object, data_test) {
             standardGeneric("setDataTest")
+           })
+
+setGeneric(name = "setGeneInit",
+           def = function(.Object, gene_init) {
+            standardGeneric("setGeneInit")
+           })
+
+setGeneric(name = "setGeneExp",
+           def = function(.Object, gene_dt) {
+            standardGeneric("setGeneExp")
            })
 
 # =============================================================================
@@ -221,7 +216,7 @@ setGeneric(name = "setDataTest",
 
 #' Extract gene expression slot
 #'
-#' @param monetData monetData class object.
+#' @param monetDataRaw monetDataRaw class object.
 #'
 #' @export
 #'
@@ -234,7 +229,7 @@ setMethod(f = "getGeneExp",
 
 #' Extract ATACseq slot
 #'
-#' @param monetData monetData class object.
+#' @param monetDataRaw monetDataRaw class object.
 #'
 #' @export
 setMethod(f = "getAtacSeq",
@@ -243,9 +238,22 @@ setMethod(f = "getAtacSeq",
             return(.Object@atac_seq)
           })
 
+#' Extract initial gene expression
+#'
+#' Extract gene expression for the initial time-point.
+#'
+#' @param monetDataRaw monetDataRaw class object.
+#'
+#' @export
+setMethod(f = "getGeneInit",
+          signature = "monetDataRaw",
+          definition = function(.Object) {
+            return(.Object@gene_exp_init)
+          })
+
 #' Update data_test slot
 #'
-#' @param monetData monetData class object.
+#' @param monetDataRaw monetDataRaw class object.
 #' @param data_test new data_test entry.
 #'
 #' @export
@@ -253,5 +261,63 @@ setMethod(f = "setDataTest",
           signature = "monetDataRaw",
           definition = function(.Object, data_test) {
             .Object@data_test <- data_test
+            return(.Object)
+          })
+
+#' Update init gene expression
+#'
+#' @param monetDataRaw S4 class.
+#' @param gene_init data.table. New entry to be used. First column with gene
+#'   names (named "gene") second column with the entries.
+#'
+#' @importFrom data.table as.data.table
+#'
+#' @export
+setMethod(f = "setGeneInit",
+          signature = "monetDataRaw",
+          definition = function(.Object, gene_init) {
+            if (!any(class(gene_init) %in% c("data.table", "data.frame"))) {
+                stop("gene_init needs to be a data.frame or data.table")
+            }
+
+            if (!("gene" %in% colnames(gene_init))) {
+                stop("The data.frame needs one column with gene names called",
+                     "'gene'")
+            }
+
+            .Object@gene_exp_init <- as.data.table(gene_init)
+
+            return(.Object)
+          })
+
+#' Update gene expression
+#'
+#' @param monetDataRaw S4 class.
+#' @param gene_dt data.table. New entry to be used. First column with gene
+#'   names (named "gene") subsequent columns are gene expression at
+#'   time-points.
+#'
+#' @importFrom data.table as.data.table
+#'
+#' @export
+setMethod(f = "setGeneExp",
+          signature = "monetDataRaw",
+          definition = function(.Object, gene_dt) {
+            if (!any(class(gene_dt) %in% c("data.table", "data.frame"))) {
+                stop("gene_dt needs to be a data.frame or data.table")
+            }
+
+            if (!("gene" %in% colnames(gene_dt))) {
+                stop("The data.frame needs one column with gene names called",
+                     "'gene'")
+            }
+
+            if (ncol(.Object@gene_exp) != ncol(gene_dt)) {
+                stop("The new data provided doesn't have the same number of ",
+                     "time-points.")
+            }
+
+            .Object@gene_exp <- as.data.table(gene_dt)
+
             return(.Object)
           })

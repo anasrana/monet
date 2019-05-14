@@ -3,23 +3,13 @@
 \docType{class}
 \name{monetData-class}
 \alias{monetData-class}
-\title{MONET data input class}
+\title{MONET filtered data input class}
 \description{
-MONET data input class
+MONET filtered data input class
 }
 \section{Slots}{
 
 \describe{
-\item{\code{gene_exp}}{data.table. Gene expression time-course data.}
-
-\item{\code{atac_seq}}{data.table. ATAC-seq data for each time-point.}
-
-\item{\code{no_tpts}}{number of time-points.}
-
-\item{\code{no_genes}}{number of genes in the data, derived from \code{gene_exp}.}
-
-\item{\code{no_tf_try}}{number of trascription factors to try.}
-
-\item{\code{gene_names}}{vector of gene.names.}
+\item{\code{exp_filt}}{filtered list of gene}
 }}
 

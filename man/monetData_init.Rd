@@ -5,7 +5,8 @@
 \title{monetData initialize}
 \usage{
 monetData_init(gene_exp = NULL, atac_seq = NULL, gene_col = NULL,
-  gene_atac = NULL, gene_exp0 = NULL)
+  transform = c("asinh", "log", "none"), gene_atac = NULL,
+  gene_exp0 = NULL)
 }
 \arguments{
 \item{gene_exp}{gene expression. Either path to gene expression file or

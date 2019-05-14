@@ -5,7 +5,7 @@
 \title{Stan_monet}
 \usage{
 stan_monet.fit(standata, ..., algorithm = c("sampling", "optimizing",
-  "fullrank"))
+  "fullrank", "mcmc"))
 }
 \arguments{
 \item{algorithm}{character. Choose option for stan model.}
