@@ -4,3 +4,4 @@
 ^monet\.taskpaper$
 ^data$
 ^results$
+^README\.Rmd$

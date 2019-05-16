@@ -1,11 +1,11 @@
 Package: monet
 Title: Multi-Omics NETwork inference (MONET)
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R:
   person("Anas Ahmad", "Rana", email = "a.a.rana@bham.ac.uk",
        role = c("aut", "cre"))
 Maintainer: Anas Ahmad Rana <a.a.rana@bham.ac.uk>
-Description: What the package does (one paragraph).
+Description: We developed a novel Bayesian nonparametric regression approach called Multi-Omics NETwork inference (MONET) for high-dimensionality multi-modal data integration in order to quantify the temporally dependent forces driving development and to distinguish these from those induced by perturbation effects. Statistical inference is performed in a Bayesian setting using `rstan` an implementation in `R` of `STAN` (a probabilistic programming language for statistical inference).
 License: GPL (>=3)
 Depends:
   methods,
