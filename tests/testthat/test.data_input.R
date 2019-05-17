@@ -41,31 +41,3 @@ test_that("testing with path", {
     expect_equal(monet_data@gene_exp_path, "gene_exp.csv")
 })
 
-context("monet data filtering")
-
-test_that("testing monedtData filter", {
-    monet_data <- monetData_init(gene_path, atac_path, "gene", "asinh", "Gene")
-
-    monet_filt <- monet_data_filter(monet_data,
-                      gene_filt = c(atac_dt$gene[1:20], "Grb10", "Wnt11"))
-
-    expect_is(monet_filt, "monetData")
-    expect_equal(length(monet_filt@gene_filt_list), 7)
-    expect_equal(monet_filt@data_test, TRUE)
-
-    monet_filt <- monet_data_filter(monet_data,
-                      noise = 2)
-
-    expect_is(monet_filt, "monetData")
-    expect_equal(length(monet_filt@gene_filt_list), 13)
-    expect_equal(monet_data@no_tpts, 4)
-    expect_equal(monet_filt@data_test, TRUE)
-
-    monet_filt <- monet_data_filter(monet_data, no_genes = 5)
-
-    expect_is(monet_filt, "monetData")
-    expect_equal(length(monet_filt@gene_filt_list), 1)
-    expect_equal(monet_data@no_tpts, 4)
-    expect_equal(monet_filt@data_test, TRUE)
-
-})
