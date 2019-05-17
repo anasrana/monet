@@ -179,6 +179,9 @@ setMethod("show", "monetData",
 # GENERICS
 # =============================================================================
 
+# extract variables
+# ----------------------------------------
+
 setGeneric(name = "getGeneExp",
            def = function(.Object) {
             standardGeneric("getGeneExp")
@@ -194,6 +197,13 @@ setGeneric(name = "getGeneInit",
             standardGeneric("getGeneInit")
            })
 
+setGeneric(name = "getGeneList",
+           def = function(.Object) {
+            standardGeneric("getGeneList")
+           })
+
+# replace variables
+# ----------------------------------------
 
 setGeneric(name = "setDataTest",
            def = function(.Object, data_test) {
@@ -250,6 +260,15 @@ setMethod(f = "getGeneInit",
           definition = function(.Object) {
             return(.Object@gene_exp_init)
           })
+
+setMethod(f = "getGeneList",
+          signature = "monetData",
+          definition = function(.Object) {
+            return(.Object@gene_filt_list)
+          })
+
+# Setting variables in S4
+# ----------------------------------------------------------------------------
 
 #' Update data_test slot
 #'
