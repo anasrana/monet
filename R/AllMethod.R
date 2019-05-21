@@ -260,7 +260,11 @@ setMethod(f = "getGeneInit",
           definition = function(.Object) {
             return(.Object@gene_exp_init)
           })
-
+#' Extract gene overlap list
+#'
+#' @param monetData S4 class.
+#'
+#' @export
 setMethod(f = "getGeneList",
           signature = "monetData",
           definition = function(.Object) {
