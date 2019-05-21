@@ -59,7 +59,7 @@ checkFile <- function(file_path) {
 #' @param gene_col character or integer. The column which contains gene names.
 #' @param file_path character. Location of file to be read.
 #'
-#' @importFrom data.table fread
+#' @importFrom data.table fread is.data.table
 #' @importFrom dplyr nth
 #'
 testGeneCol <- function(gene_col, file_path) {
@@ -73,17 +73,27 @@ testGeneCol <- function(gene_col, file_path) {
         gene_col <- fread(file_path, nrows = 1) %>%
             colnames() %>%
             nth(gene_col)
-    } else if (!is.na(gene_num) & is.data.frame(file_path)) {
+    } else if (!is.na(gene_num) & (is.data.frame(file_path) |
+                                   is.data.table(file_path))) {
         gene_col <- colnames(file_path)[gene_col]
     }
 
     if (is.na(gene_num)) {
-        if (!(gene_col %in% colnames(fread(file_path, nrows = 1)))) {
-            stop("in monetInput-\nNo column '",
-                 gene_col,
-                 "' found in input data:- ",
-                 basename(file_path),
-                 call. = FALSE)
+        if ("character" %in% class(file_path)) {
+            if (!(gene_col %in% colnames(fread(file_path, nrows = 1)))) {
+                stop("in monetInput-\nNo column '",
+                     gene_col,
+                     "' found in input data:- ",
+                     basename(file_path),
+                     call. = FALSE)
+            }
+        } else {
+            if (!(gene_col %in% colnames(file_path))) {
+                stop("in monetInput-\nNo column '",
+                     gene_col,
+                     "' found in input data provided.",
+                     call. = FALSE)
+            }
         }
     }
 
