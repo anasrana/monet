@@ -29,7 +29,7 @@ monet_data_filter <- function(monet_data,
 
     # perform initial filteration based on input information
 
-    gen_l <- filter_stdd(monet_data, no_genes, noise_flt)
+    gen_l <- filter_stdd(monet_data, no_genes, noise_flt, mu_th, sd_th)
 
     gene_dt <- gen_l[["g_dt"]]
     gene_i_dt <- gen_l[["g_t0"]]
