@@ -6,3 +6,17 @@
     message("No stan programs to compile were found.")
   }
 }
+
+.onAttach <- function(libname, pkgname) {
+  if (!interactive()) {
+    return()
+  }
+
+  v = packageVersion("monet")
+  d = read.dcf(system.file("DESCRIPTION", package="monet"),
+               fields = c("Packaged", "Built", "Revision"))
+  startupMessage = ""
+    packageStartupMessage(
+      "Package monet loaded"
+    )
+}
