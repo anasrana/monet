@@ -1,5 +1,3 @@
-#' Stan_monet
-#'
 #' Model fit for monet.
 #'
 #' @param model_par list conttaining model parameters. Use [monet_input_prep]
@@ -10,25 +8,38 @@
 #'
 #' @export
 #'
-#' @importFrom rstan optimizing
+#' @importFrom rstan optimizing sampling
 stan_monet.fit <- function(standata,
                            ...,
-                           algorithm =
-                            c("sampling", "optimizing", "fullrank")) {
-
+                           algorithm = c("sampling", "optimizing"),
+                           cores = 1L) {
     algorithm <- match.arg(algorithm)
     stanfit <- stanmodels$monet
 
+
+    cores = getOption("mc.cores", 1L)
     if (algorithm == "optimizing") {
-        optimizing_args <- list(...)
-        if (is.null(optimizing_args$draws)) {
-            optimizing_args$draws <- 100000L
+        optim_arg <- list(...)
+        if (is.null(optim_arg$draws)) {
+            optim_arg$draws <- 100000L
         }
-        optimizing_args$object <- stanfit
-        optimizing_args$data <- standata
-        optimizing_args$constrained <- TRUE
-        out <- suppressWarnings(do.call(optimizing, args = optimizing_args))
+        optim_arg$object <- stanfit
+        optim_arg$data <- standata
+        optim_arg$constrained <- TRUE
+        out <- suppressWarnings(do.call(optimizing, args = optim_arg))
 
         return(out)
+    } else if (algorithm == "sampling") {
+        sampling_pars <-
+            prepSampling(stanfit_obj = stanfit,
+                         data = standata,
+                         user_dots = list(...),
+                         show_messages = FALSE,
+                         cores = cores)
+
+        monet_fit <- do.call(sampling, sampling_pars)
+
+        # TODO: include checks for results
+        return(monet_fit)
     }
 }
