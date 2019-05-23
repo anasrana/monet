@@ -207,3 +207,39 @@ gene_long[, value := (value - mean(value, na.rm = TRUE)) /
                         sd(value, na.rm = TRUE), by = "gene"]
 
 }
+
+#' Default arguments for sampling
+#'
+#' Used to set parameters and arguments for [rstan::sampling()], combine user
+#' supplided parameters and defaults.
+#'
+#' @param stanfit_obj The stanfit object to use for sampling.
+#' @param data The data input to the stanfit object.
+#' @param user_dots User supplied parameteres.
+#'
+prepSampling <- function(stanfit_obj, data = NULL, user_dots = list(), ...) {
+
+    # TODO: add `adapt_delta`
+    sampling_par <- list(object = stanfit_obj, data = data, ...)
+    dot_nms <- names(user_dots)
+    for (j in seq_along(user_dots)) {
+        sampling_par[[dot_nms[j]]] <- user_dots[[j]]
+    }
+
+    # TODO: potentially think about data based choices of some of these
+    par_default <-
+    list(pars = c("x", "b", "w"), # parameter to extract
+         chains = 4, iter = 2000, thin = 1,
+         seed = sample.int(.Machine$integer.max, 1),
+         init = 'random', check_data = TRUE,
+         sample_file = NULL, diagnostic_file = NULL, verbose = FALSE,
+         # options for algorithm c("NUTS", "HMC", "Fixed_param"),
+         algorithm = "NUTS", control = NULL, include = TRUE,
+         save_warmup = FALSE)
+
+    diff_par <- setdiff(names(par_default), dot_nms)
+
+    sampling_par <- c(par_default[diff_par], sampling_par)
+
+    return(sampling_par)
+}
