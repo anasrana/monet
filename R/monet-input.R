@@ -33,21 +33,19 @@ monet_input_prep <- function(monet_class,
         par_list <- c(par_list, pre_def_par[new_nm])
     }
 
-    if (class(monet_class) == "monetDataFilt") {
-        gn_lst <- monet_class@gene_filt_list
-        gene_dt <- monet_class@gene_exp[gn_lst][, -"gene"]
-        atac_dt <- monet_class@atac_seq[gn_lst][, -"gene"]
-        gene_init <- monet_class@gene_exp_init[gn_lst][[2]]
-    } else if (class(monet_class) == "monetData") {
-        if (monet_class@data_test != TRUE) {
-            stop("monetData object can't be analysed, it needs to be filtered")
-        } else {
-            gn_lst <- monet_class@gene_names
-            gene_dt <- monet_class@gene_exp[, -"gene"]
-            atac_dt <- monet_class@atac_seq[, -"gene"]
-            gene_init <- monet_class@gene_exp_init[[2]]
-        }
+
+    if (class(monet_class) == "monetDataRaw") {
+        warning("monetDataRaw object provided, default filtering used.",
+                "\nTo use your own call 'monet_data_filter()' first.")
+
+        monet_class <-
+            monet_data_filter(monet_class, no_genes = 1000)
     }
+
+    gn_lst <- getGeneList(monet_class)
+    gene_dt <- getGeneExp(monet_class)[gn_lst][, -"gene"]
+    atac_dt <- getAtacSeq(monet_class)[gn_lst][, -"gene"]
+    gene_init <- getGeneInit(monet_class)[gn_lst][[2]]
 
     # add monetData object
     par_list[["no_gns"]] <- length(gn_lst)
