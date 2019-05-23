@@ -3,6 +3,7 @@ context("Reading csv data files")
 
 gene_path <- "gene_exp.csv"
 gene_path2 <- "gene_exp_v2.csv"
+gene_w_path <- "gene.csv"
 atac_path <- "atac_seq_tf.csv"
 atac_wrong <- "atac_seq.csv"
 
@@ -42,6 +43,11 @@ test_that("Fails with wrong gene col", {
 
     expect_error(monet:::prepGeneExp(gene_dt, "Gene"),
                  regexp = "No column 'Gene' found in input data provided.")
+})
+
+test_that("Fails with wrong path", {
+  expect_error(monet:::prepGeneExp(gene_w_path, "Gene"),
+               "File 'gene.csv' does not exist or is non-readable.")
 })
 
 context("monet data prep")
