@@ -63,3 +63,21 @@ setClass("monetOptim",
                       w = "vector",
                       gene_names = "vector",
                       rstan_optim = "list"))
+
+#' MONET sampling output class
+#'
+#' This class contains a stanfit object and some useful variables.
+#' @slot x_est array of the mcmc chains.
+#' @slot b_est array of the mcmc cahins.
+#' @slot w
+setClass("monetSample",
+         slots = list(x_est = "array",
+                      b_est = "array",
+                      w = "matrix",
+                      gene_names = "vector",
+                      stanfit = "list",
+                      n_iter = "numeric",
+                      n_warmup = "numeric",
+                      n_chains = "numeric",
+                      w_up_saved = "logical"
+                      ))

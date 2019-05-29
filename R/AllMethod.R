@@ -117,6 +117,31 @@ setMethod("initialize",
     return(.Object)
           })
 
+#' initialize monetSample class
+#'
+#' @return monetSample object
+#'
+#' @importFrom rstan extract
+setMethod("initialize",
+          signature = "monetSample",
+          function(.Object, stanfit_obj, gene_names) {
+            # extract useful mcmc and result properties
+            .Object@n_iter <- stanfit_obj@sim$iter
+            .Object@n_warmup <- stanfit_obj@sim$warmup
+            .Object@n_chains <- stanfit_obj@sim$chains
+            .Object@w_up_saved <- stanfit_obj@stan_args[[1]]$save_warmup
+
+            # extract mcmc chains
+            posterior <- extract(stanfit_obj)
+            .Object@x_est = posterior$x
+            .Object@b_est = posterior$b
+            .Object@w = posterior$w
+            .Object@gene_names = gene_names
+            .Object@stanfit = list("fit" = stanfit_obj)
+
+            return(.Object)
+          })
+
 # =============================================================================
 # Printing methods
 # =============================================================================
@@ -132,7 +157,7 @@ setMethod("show", "monetDataRaw",
     g_names <- object@gene_names
     cat("------------------------------------\n",
         "---- MONET Raw input data class ----\n",
-        object@no_genes, " genes and   ", object@no_tpts, " time-points\n",
+        object@no_genes, " genes and ◦ ", object@no_tpts, " time-points\n",
         "----------------------------------\n")
     if (object@gene_exp_path != "NA") {
         cat("Data imported from: ", basename(object@gene_exp_path), "\n")
@@ -160,7 +185,7 @@ setMethod("show", "monetData",
         "------------ FILTERED -------------\n",
         "----- MONET input data class -----\n",
         length(object@gene_filt_list), "of", object@no_genes,
-        "genes and   ", object@no_tpts, " time-points\n",
+        "genes and ◦ ", object@no_tpts, " time-points\n",
         "----------------------------------\n")
     if (object@gene_exp_path != "NA") {
         cat("Data imported from: ", basename(object@gene_exp_path), "\n")
@@ -174,6 +199,22 @@ setMethod("show", "monetData",
                 call. = FALSE)
     }
   })
+
+#' Print method for monetSample
+#'
+#' @param monetSample
+#'
+#' @export
+setMethod("show", "monetSample",
+  function(object) {
+    no_g <- length(object@gene_names)
+    cat("------------------------------------\n",
+        "------- MONET Sampler fitted ------\n",
+        no_g, " genes ◦ ", object@n_chains, "MCMC chains\n",
+        object@n_iter, " iterations ◦ ", object@n_warmup,
+        " warmup")
+
+})
 
 # =============================================================================
 # GENERICS
